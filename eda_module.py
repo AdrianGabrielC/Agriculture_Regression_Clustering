@@ -24,7 +24,7 @@ def show_best_cultivars_gy(df):
     plt.tight_layout()
     plt.show()
 
-def show_delta_gy_mhg(df):
+def show_delta(df, column):
     # First chart for GY
     s1 = df[df.Season == 1][['Cultivar', 'MHG', 'GY']]
     s1_cultivar_avg = s1.groupby('Cultivar').mean()
@@ -39,38 +39,18 @@ def show_delta_gy_mhg(df):
     merged_df['GY_difference'] = abs(merged_df['GY_season2'] - merged_df['GY_season1'])
     merged_df['MHG_difference'] = abs(merged_df['MHG_season2'] - merged_df['MHG_season1'])
 
-    merged_df.plot(x="Cultivar", y=['GY_season1', 'GY_season2'], kind='bar', figsize=(22, 10))
-    plt.ylabel('Grain Yield (kg/ha)')
-
-    # Second chart GY
-    s1 = df[df.Season == 1][['Cultivar', 'MHG', 'GY']]
-    s1_cultivar_avg = s1.groupby('Cultivar').mean()
-
-    s2 = df[df.Season == 2][['Cultivar', 'MHG', 'GY']]
-    s2_cultivar_avg = s2.groupby('Cultivar').mean()
-
-    s1_cultivar_avg.reset_index(inplace=True)
-    s2_cultivar_avg.reset_index(inplace=True)
-
-    merged_df = pd.merge(s1_cultivar_avg, s2_cultivar_avg, on='Cultivar', suffixes=('_season1', '_season2'))
-    merged_df['GY_difference'] = abs(merged_df['GY_season2'] - merged_df['GY_season1'])
-    merged_df['MHG_difference'] = abs(merged_df['MHG_season2'] - merged_df['MHG_season1'])
-
-    merged_df.plot(x="Cultivar", y=['GY_season1', 'GY_season2'], kind='bar', figsize=(22, 10))
-    plt.ylabel('Grain Yield (kg/ha)')
-
-    # First chart MHG
-    merged_df.plot(x="Cultivar", y=['MHG_season1', 'MHG_season2'], kind='bar', figsize=(22, 10))
-
-    # Second chart GY
+    merged_df.plot(x="Cultivar", y=[f'{column}_season1', f'{column}_season2'], kind='bar', figsize=(22, 10))
+    if column == 'GY':plt.ylabel('Grain Yield (kg/ha)')
+    else: plt.ylabel('Thousand Seed Weight (g)')
     plt.figure(figsize=(10, 6))
-    sns.barplot(x='Cultivar', y='MHG_difference', data=merged_df)
+    sns.barplot(x='Cultivar', y=f'{column}_difference', data=merged_df)
     plt.xticks(rotation=90)  # Rotate x-axis labels for better readability
     plt.xlabel('Cultivar')
-    plt.ylabel('Difference in MHG values')
-    plt.title('Difference in MHG values between two datasets for each Cultivar')
+    plt.ylabel(f'Difference in {column} values')
+    plt.title(f'Difference in {column} values between two datasets for each Cultivar')
     plt.tight_layout()
     plt.show()
+
 
 
 def remove_outliers(df):
